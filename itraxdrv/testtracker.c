@@ -39,7 +39,7 @@
 #define DEVICENAME "/dev/input/tracker0"
 
 
-/*  #define POLL  */
+#define POLL 
 
 
 
@@ -89,19 +89,19 @@ int main (int argc,char *argv[])
  printf("abs0:%d abs1:%d abs2:%d abs3:%d abs4:%d\n",abs[0],abs[1],abs[2],abs[3],abs[4]);
 
 
- filter.type = ITRAX_FILTER_FASTMEAN;
- filter.size = 5;
- filter.axes = 0;
- filter.coeff = coeff;
+/*   filter.type = ITRAX_FILTER_FASTMEAN; */
+/*   filter.size = 5; */
+/*   filter.axes = 0; */
+/*   filter.coeff = coeff; */
 
- if (ioctl(tracker,ITRAXIOCSFILTER,&filter ) <0) 
-	    perror("ioctl ITRAXIOCSFILTER");
- if (ioctl(tracker,ITRAXIOCGFILTER,&filter) <0) {
-   perror("ioctl ITRAXIOCGFILTER");
-   exit(1);
- }
- printf("filter axes: %d type: %d size: %d\n",filter.axes,
-	filter.type,filter.size);
+/*   if (ioctl(tracker,ITRAXIOCSFILTER,&filter ) <0)  */
+/*  	    perror("ioctl ITRAXIOCSFILTER"); */
+/*   if (ioctl(tracker,ITRAXIOCGFILTER,&filter) <0) { */
+/*     perror("ioctl ITRAXIOCGFILTER"); */
+/*     exit(1); */
+/*   } */
+/*   printf("filter axes: %d type: %d size: %d\n",filter.axes, */
+/*  	filter.type,filter.size); */
 
  
 
@@ -115,21 +115,28 @@ int main (int argc,char *argv[])
  sleep(1);
  
   // ncurses needs this 
+#ifdef USE_CURSES
   win = initscr();
   cbreak();
   noecho();
   nodelay(win,TRUE);
-
+#endif
 
   
   finished = FALSE;
 
   while ( ! finished  ) 
     { 
- 
+/*        poll(&ufds,1,1); */
       read(tracker, &data, sizeof (struct trackerposition));
-      fprintf(stderr," %5.1f %5.1f %5.1f  \r",data.raw[0],data.raw[1],data.raw[2]);
+
+/*        printf(" %5i %5i %5i  \n",data.tenthdegree[0],data.tenthdegree[1],data.tenthdegree[2]); */
+
+      printf(" %5.1f %5.1f %5.1f  \n",data.tenthdegree[0]/10.0,data.tenthdegree[1]/10.0,data.tenthdegree[2]/10.0 );
+
+/*        printf(" %5i %5i %i  \r",data.raw[0],data.raw[1],data.raw[2]);  */
       
+#ifdef USE_CURSES
       c = getch();
       switch (c) 
 	{
@@ -139,14 +146,42 @@ int main (int argc,char *argv[])
 	default:
 	  break;
 	}
+#endif
     }
+
+#ifdef USE_CURSES
   echo();
   nocbreak();
   endwin();  
-  
+#endif
+
   close(tracker);
   return 0;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

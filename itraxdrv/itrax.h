@@ -53,8 +53,8 @@ struct filtercontrol {
 
 struct trackerposition {
   struct timeval time;
-  float raw[3];
-
+  int raw[3];
+  int tenthdegree[3];
 };
 
 

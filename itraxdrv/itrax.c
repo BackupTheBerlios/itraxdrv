@@ -29,7 +29,7 @@
 #define TRACKDEV_MINORS		2
 
 #include <linux/poll.h>
-#include <linux/malloc.h>
+#include <linux/slab.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/input.h>
@@ -60,9 +60,9 @@ struct trackdev_filter {
   int size;
   int type;  /* see itrax.h for types */
   int head;
-  double lfv;  /*last filtered value */
-  double *buffer;
-  double *coeff;   /* coeff. for wighted filter */
+  float lfv;  /*last filtered value */
+  float *buffer;
+  float *coeff;   /* coeff. for wighted filter */
   int buffer_full; /* ready to run ? */ 
 };
 
@@ -100,11 +100,15 @@ static void trackdev_event(struct input_handle *handle, unsigned int type, unsig
 		if (code < 3 || code > 5) 
 		     printk(KERN_ERR "itrax: Unknown eventcode : %d\n",code);
 		else  {
+		  list->position.raw[code-3] =value ;
+		  list->position.tenthdegree[code-3] =(value * 1800) / 32768; 
+		
+#ifdef NOFILTERS
 
-		  list->position.raw[code-3] =((double)value * 180) / 32768;
 		  /*  normalize to 0..360, -80..+80, -90..+90 */
 		  if (code-3 == 2 || code -3 == 1) 
 		    if (list->position.raw[code-3] >180) list->position.raw[code-3] -=360;
+
 
   		  switch (list->filter[code-3].type ) { 
 		  case ITRAX_FILTER_OFF:
@@ -151,8 +155,8 @@ static void trackdev_event(struct input_handle *handle, unsigned int type, unsig
 		    if (filter->buffer_full)  
 		    list->position.raw[code-3] = filter->lfv;
 		    break;
-		    
 		  }  /* end of switch (filtertype) */
+#endif    
 
 		  /* new data arrived */
 		  list->new = 1;
@@ -360,7 +364,7 @@ static int trackdev_ioctl(struct inode *inode, struct file *file, unsigned int c
 /*  	     list->filter[filterc.axes].size ,filterc.axes); */
       /* allocate new buffer */
       list->filter[filterc.axes].buffer = 
-	kmalloc(list->filter[filterc.axes].size * sizeof(double), GFP_KERNEL);
+	kmalloc(list->filter[filterc.axes].size * sizeof(float), GFP_KERNEL);
       list->filter[filterc.axes].head = 0;
       list->filter[filterc.axes].buffer_full = 0;
       
