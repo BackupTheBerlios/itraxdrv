@@ -1,0 +1,24 @@
+Installation Notes
+
+InterTrax 2 USB event handler module
+
+ - make
+ - su 
+ - make install
+ - ./testtracker
+
+
+
+"make install" will copy itrax.o to /lib/modules/misc and make "depmod".
+If not found, the following device will be created:
+
+crw-r--r--   1 root     root      13, 128 Nov 27 11:34 /dev/input/tracker0 
+
+The minor devicenumber is not officaly assigned yet.
+
+This module was tested with Linux 2.2.16 (SuSE) and 2.4.0.
+
+
+Jan-Friso Evers
+evers@mip.informatik.uni-kiel.de
+www.mip.informatik.uni-kiel.de/~evers
