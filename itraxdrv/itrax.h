@@ -31,20 +31,19 @@ struct filtercontrol {
 
 /*get driver version */
 #define ITRAXIOCGVERSION           _IOR('E', 0x01, int)  
+
 /* get device ID */ 
 #define ITRAXIOCGID                _IOR('E', 0x02, short[4])  
+
 /* get device name */
 #define ITRAXIOCGNAME(len)         _IOC(_IOC_READ, 'E', 0x06, len)   
+
 /* get abs value/limits */
 #define ITRAXIOCGABS(abs)          _IOR('E', 0x40 + abs, int[5])  
-/* set callibration NOW*/ 
-#define ITRAXIOCSCALL              _IOR('E', 0x42, NULL) 
-/* get callibration */ 
-#define ITRAXIOCGCALL              _IOR('E', 0x43, float *)
-/* set user-callibration */
-#define ITRAXIOCSCALLUSER          _IOR('E', 0x44, float[3])
+
 /* set filter  */
 #define ITRAXIOCSFILTER            _IOR('E', 0x45,struct filtercontrol *)
+
 /* get filter  */
 #define ITRAXIOCGFILTER            _IOR('E', 0x46,struct filtercontrol * ) 
  
@@ -55,7 +54,6 @@ struct filtercontrol {
 struct trackerposition {
   struct timeval time;
   float raw[3];
-  float callibrate[3];
 
 };
 

@@ -72,7 +72,6 @@ struct trackdev_filter {
 
 struct trackdev_list {
   struct trackerposition position;
-  float offset[3]  ;         // callibration data
   int new;
   struct trackdev_filter filter[3]; 
   struct fasync_struct *fasync;
@@ -103,11 +102,12 @@ static void trackdev_event(struct input_handle *handle, unsigned int type, unsig
 		else  {
 
 		  list->position.raw[code-3] =((double)value * 180) / 32768;
+		  /*  normalize to 0..360, -80..+80, -90..+90 */
+		  if (code-3 == 2 || code -3 == 1) 
+		    if (list->position.raw[code-3] >180) list->position.raw[code-3] -=360;
 
   		  switch (list->filter[code-3].type ) { 
 		  case ITRAX_FILTER_OFF:
-		    list->position.callibrate[code-3] = 
-		      list->position.raw[code-3]- list->offset[code-3];
 		    break;
 		  case ITRAX_FILTER_SLIDING_WINDOW:
 		    filter = &(list->filter[code-3]);
@@ -126,7 +126,7 @@ static void trackdev_event(struct input_handle *handle, unsigned int type, unsig
 		    for (i=0 ; i<filter->size ; i++) {
 		      filter->lfv += (filter->buffer[i] * filter->coeff[i]);
 		    }
-		    list->position.callibrate[code-3] = filter->lfv -list->offset[code-3];
+		    list->position.raw[code-3] = filter->lfv;
 		    break;
 		    
 		  case ITRAX_FILTER_FASTMEAN:
@@ -149,17 +149,11 @@ static void trackdev_event(struct input_handle *handle, unsigned int type, unsig
 		    }
 		    /* calculate filtered value */
 		    if (filter->buffer_full)  
-		    list->position.callibrate[code-3] = 
-		      filter->lfv -  list->offset[code-3];
+		    list->position.raw[code-3] = filter->lfv;
 		    break;
 		    
 		  }  /* end of switch (filtertype) */
 
-		  /* normalize  */
-		  if (list->position.callibrate[code-3] >  180)  
-		    list->position.callibrate[code-3] -= 360;
-		  if (list->position.callibrate[code-3] < -180)  
-		    list->position.callibrate[code-3] += 360;
 		  /* new data arrived */
 		  list->new = 1;
 #ifdef K24	     
@@ -329,41 +323,6 @@ static int trackdev_ioctl(struct inode *inode, struct file *file, unsigned int c
     if ((retval = put_user(dev->idproduct, ((short *) arg) + 2))) return retval;
     if ((retval = put_user(dev->idversion, ((short *) arg) + 3))) return retval;
     return 0;
-  case ITRAXIOCSCALL  :
-     /* recalculate callibrated position   */
-    for (i=0; i<3; i++) {
-      if (list->filter[i].type == ITRAX_FILTER_OFF) {
-	list->offset[i] = list->position.raw[i];
-	printk("Axes %d callibrated to raw\n",i);
-	}
-      else {
-	list->offset[i] = list->filter[i].lfv;
-	printk("Axes %d callibrated to lfv\n",i);
-      }
-     /* recalculate callibrated position   */
-      list->position.callibrate[i] = list->position.raw[i] - list->offset[i];
-      if (list->position.callibrate[i] >  180)  
-	list->position.callibrate[i] -= 360;
-      if (list->position.callibrate[i] < -180)  
-	list->position.callibrate[i] += 360;
-    }
-    return 0;
-
-  case ITRAXIOCSCALLUSER  :
-     /* recalculate callibrated position   */
-    for (i=0; i<3; i++) {
-    list->offset[i] = ((float *)arg)[i];
-      list->position.callibrate[i] = list->position.raw[i] - list->offset[i];
-      if (list->position.callibrate[i] >  180)  
-	list->position.callibrate[i] -= 360;
-      if (list->position.callibrate[i] < -180)  
-	list->position.callibrate[i] += 360;
-    }
-    return 0;
-
-  case ITRAXIOCGCALL  :
-    return copy_to_user((float *) arg,list->offset , 
-			sizeof(float[3])) ? -EFAULT : sizeof(float[3]);
 
   case ITRAXIOCSFILTER :
     if (((struct filtercontrol *)arg)->axes >2)
