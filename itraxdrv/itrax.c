@@ -32,6 +32,7 @@
 #include <linux/slab.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#include <linux/time.h>
 #include <linux/input.h>
 
 #ifdef K24
@@ -96,7 +97,8 @@ static void trackdev_event(struct input_handle *handle, unsigned int type, unsig
 	struct trackdev_filter *filter;
 	int i;
 	while (list) {
-		get_fast_time(&list->position.time);
+/*  		get_fast_time(&list->position.time); */
+		do_gettimeofday(&list->position.time);
 		if (code < 3 || code > 5) 
 		     printk(KERN_ERR "itrax: Unknown eventcode : %d\n",code);
 		else  {
