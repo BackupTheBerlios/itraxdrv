@@ -5,7 +5,7 @@ DEVICE=/dev/input/tracker0
 CFLAGS= -Wall -DITRAX_DEBUG -I$(INCLUDEDIR)
 CFLAGSMODULE=-D__KERNEL__ -DMODULE -O 
 
-KERNEL24 := $(shell if [`grep ^PATCHLEVEL $(KERNELSOURCE)/Makefile | cut -d "=" -f 2` == "4" ]; then echo -DK24; fi)
+KERNEL24 := $(shell if [`grep ^PATCHLEVEL $(KERNELSOURCE)/Makefile | cut -d "=" -f 2` = "4" ]; then echo -DK24; fi)
 
 
 INSTALL = install
