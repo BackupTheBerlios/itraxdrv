@@ -106,7 +106,8 @@ static void trackdev_event(struct input_handle *handle, unsigned int type, unsig
 
 		  /*  normalize to 0..360, -80..+80, -90..+90 */
 		  if (code-3 == 2 || code -3 == 1) 
-		    if (list->position.tenthdegree[code-3] >180) list->position.tenthdegree[code-3] -=360;
+		    if (list->position.tenthdegree[code-3] >1800) 
+		      list->position.tenthdegree[code-3] -=3600;
 
 		  /*  All stuff below is for filtering */
   		  switch (list->filter[code-3].type ) { 
