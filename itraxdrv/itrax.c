@@ -553,4 +553,5 @@ module_exit(trackdev_exit);
 
 MODULE_AUTHOR("Jan-Friso Evers <evers@mip.informatik.uni-kiel.de");
 MODULE_DESCRIPTION("Intertrax2 Headtracker character device driver");
+MODULE_LICENSE("GPL");
 
