@@ -25,7 +25,7 @@ clean:
 
 install: all
 	$(INSTALL) -m 644 $(HEADER) $(INCDIR)
-	cp itrax.ko /lib/modules/`uname -r`/kernel/misc
+	cp itrax.ko /lib/modules/`uname -r`/kernel/misc/
 
 
 $(OBJS): %.ko: %.c %.h
