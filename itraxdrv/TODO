@@ -1,5 +1,14 @@
 - set up toplevel Makefile to determine kernel version and
   jump into appropriate subdir
+
+- remove some code from subdir-Makefiles
+
 - move testtracker.c into subdir "examples"
+
 - add gtrack
+
 - release new version
+
+- add GPL header to code
+
+- test it :-)
