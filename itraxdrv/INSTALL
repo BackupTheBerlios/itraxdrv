@@ -7,19 +7,43 @@ InterTrax 2 USB event handler module
  - make install
  - ./testtracker
 
+For now you have to select the appropriate subdirectory manually. 
+For Linux kernel 2.4.x:
+> cd 2.4
 
+For Linux kernel 2.6.x:
+> cd 2.6
 
-"make install" will copy itrax.o to /lib/modules/`uname -r`/misc and make "depmod".
-If not found, the following device will be created:
+then:
+
+> make
+> make install 
+This will copy itrax.o to /lib/modules/`uname -r`/misc and execute  "depmod".
+The following device will be created, if not found:
 
 crw-r--r--   1 root     root      13, 128 Nov 27 11:34 /dev/input/tracker0 
 
 The minor devicenumber is not officaly assigned yet.
 
-This module was tested with Linux 2.2.16 (SuSE) and 2.4.0 up to 2.4.9, but it should work with 
+
+Linux 2.4:
+
+This module was tested with Linux 2.2.16 (SuSE) and 2.4.0 up to 2.4.9,
+but it should work with newer versions also.
+
+
+Linux 2.6:
+
+This module was tested with Linux 2.6.9 (Gentoo), but it should work with 
 newer versions also.
 
+---------------------------------------------------------------------------
+This project is hosted at developer.berlios.de
 
 Jan-Friso Evers
 evers@mip.informatik.uni-kiel.de
 www.mip.informatik.uni-kiel.de/~evers
+
+Oliver Schneider
+eMail: Oliver.Schneider@zgdv.de
+URL: http://www.zgdv.de/distel

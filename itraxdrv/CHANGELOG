@@ -1,3 +1,6 @@
+0.5		2004-12-01
+	Ported to kernel 2.6
+
 0.4.1	2002-01-08
 	Fixed a wrap-around bug in trackdev_event().
 	tenth of degree must be compared to 1800 not to 180, 3600 must be 
