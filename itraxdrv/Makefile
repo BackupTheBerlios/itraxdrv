@@ -23,7 +23,6 @@ LDLIBS=-lncurses
 PROGRAM=testtracker
 
 
-# installation prefix to use if $MIPINC, $MIPLIB are not defined
 ifndef PREFIX
 ifndef MIPSRC
 PREFIX = /usr/local
