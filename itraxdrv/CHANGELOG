@@ -1,0 +1,25 @@
+0.4.1	2002-01-08
+	Fixed a wrap-around bug in trackdev_event().
+	tenth of degree must be compared to 1800 not to 180, 3600 must be 
+	subtracted, not 360
+
+0.4	2002-01-04
+	Major API change.
+	Under heavy load conditions, especially MMX/FPU load, itrax.o produces 
+	lots of NaNs instead of data. These NaNs occure in the conversion from
+	int to float with some float calculations.
+ 	From now on all data is exported as int. The field "int raw[3]" now 
+	delivers the data as received from the hardware without any conversion.
+	Converted data is stored in "int tenthdegree[3]". To reach sufficient
+	 precision, not degree but tenth of degree are used. 
+		tenthdegree = (raw * 1800) / 32768
+
+
+0.3	2001-10-04
+	Makefile fixes
+	removed IOCTL for calibrate/uncallibrate
+	changed struct trackerposition, callibrated[] removed
+	testtracker.c adopted
+
+0.2	2001-06-26
+	first release
