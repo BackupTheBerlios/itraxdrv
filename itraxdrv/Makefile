@@ -32,6 +32,8 @@ $(OBJS): %.o: %.c %.h
 clean:
 	rm -f *.o *.ps *~ $(PROGRAM)
 
+distclean: clean
+
 ${PROGRAM}.o:  ${PROGRAM}.c
 	${CC} ${CFLAGS} -c ${PROGRAM}.c
  
