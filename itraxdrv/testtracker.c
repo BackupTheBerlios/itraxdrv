@@ -39,8 +39,8 @@
 #define DEVICENAME "/dev/input/tracker0"
 
 
-#define POLL 
-
+/* #define POLL */
+#define USE_CURSES
 
 
 int main (int argc,char *argv[])
@@ -56,10 +56,10 @@ int main (int argc,char *argv[])
    char name[100];
    int abs[5];
    int finished;
-  struct filtercontrol  filter;
+/*    struct filtercontrol  filter; */
   char c;
   WINDOW *win;
-  float coeff[]={0.2 , 0.2 , 0.2 , 0.2 , 0.2};
+/*    int coeff[]={2 , 2 , 2 , 2 , 2}; */
 
 
   if ( (tracker = open(DEVICENAME,O_NONBLOCK)) < 0) 
@@ -108,11 +108,8 @@ int main (int argc,char *argv[])
 #ifdef POLL
  ufds.fd = tracker;
  ufds.events = POLLIN ;
- printf("enter poll()\n");
- poll(&ufds,1,-1);
- printf("poll returned POLLIN \n");
 #endif
- sleep(1);
+
  
   // ncurses needs this 
 #ifdef USE_CURSES
@@ -127,14 +124,17 @@ int main (int argc,char *argv[])
 
   while ( ! finished  ) 
     { 
-/*        poll(&ufds,1,1); */
+#ifdef POLL      
+      poll(&ufds,1,1); 
+#endif
       read(tracker, &data, sizeof (struct trackerposition));
 
-/*        printf(" %5i %5i %5i  \n",data.tenthdegree[0],data.tenthdegree[1],data.tenthdegree[2]); */
-
+#ifdef USE_CURSES
+      printf(" \r%5.1f %5.1f %5.1f  ",data.tenthdegree[0]/10.0,data.tenthdegree[1]/10.0,data.tenthdegree[2]/10.0 );
+#else
       printf(" %5.1f %5.1f %5.1f  \n",data.tenthdegree[0]/10.0,data.tenthdegree[1]/10.0,data.tenthdegree[2]/10.0 );
+#endif
 
-/*        printf(" %5i %5i %i  \r",data.raw[0],data.raw[1],data.raw[2]);  */
       
 #ifdef USE_CURSES
       c = getch();

@@ -60,9 +60,9 @@ struct trackdev_filter {
   int size;
   int type;  /* see itrax.h for types */
   int head;
-  float lfv;  /*last filtered value */
-  float *buffer;
-  float *coeff;   /* coeff. for wighted filter */
+  int lfv;  /*last filtered value */
+  int *buffer;
+  int *coeff;   /* coeff. for wighted filter */
   int buffer_full; /* ready to run ? */ 
 };
 
@@ -103,20 +103,19 @@ static void trackdev_event(struct input_handle *handle, unsigned int type, unsig
 		  list->position.raw[code-3] =value ;
 		  list->position.tenthdegree[code-3] =(value * 1800) / 32768; 
 		
-#ifdef NOFILTERS
 
 		  /*  normalize to 0..360, -80..+80, -90..+90 */
 		  if (code-3 == 2 || code -3 == 1) 
-		    if (list->position.raw[code-3] >180) list->position.raw[code-3] -=360;
+		    if (list->position.tenthdegree[code-3] >180) list->position.tenthdegree[code-3] -=360;
 
-
+		  /*  All stuff below is for filtering */
   		  switch (list->filter[code-3].type ) { 
 		  case ITRAX_FILTER_OFF:
 		    break;
 		  case ITRAX_FILTER_SLIDING_WINDOW:
 		    filter = &(list->filter[code-3]);
 		    /* replace oldest value with new unweighted value */
-		    filter->buffer[filter->head] = list->position.raw[code-3];
+		    filter->buffer[filter->head] = list->position.tenthdegree[code-3];
 		     /* increase pointer */
 		    if (filter->head < filter->size-1) {
   		      filter->head++;
@@ -130,7 +129,7 @@ static void trackdev_event(struct input_handle *handle, unsigned int type, unsig
 		    for (i=0 ; i<filter->size ; i++) {
 		      filter->lfv += (filter->buffer[i] * filter->coeff[i]);
 		    }
-		    list->position.raw[code-3] = filter->lfv;
+		    list->position.tenthdegree[code-3] = filter->lfv;
 		    break;
 		    
 		  case ITRAX_FILTER_FASTMEAN:
@@ -139,7 +138,7 @@ static void trackdev_event(struct input_handle *handle, unsigned int type, unsig
 		    if (filter->buffer_full)
 		      filter->lfv -= filter->buffer[filter->head];
 		    /* replace oldest value with new weighted value */
-		    filter->buffer[filter->head] = list->position.raw[code-3] 
+		    filter->buffer[filter->head] = list->position.tenthdegree[code-3] 
 		      / filter->size ;
 		    /* add new  value  to  lfv */
 		    filter->lfv += filter->buffer[filter->head];
@@ -153,10 +152,9 @@ static void trackdev_event(struct input_handle *handle, unsigned int type, unsig
 		    }
 		    /* calculate filtered value */
 		    if (filter->buffer_full)  
-		    list->position.raw[code-3] = filter->lfv;
+		    list->position.tenthdegree[code-3] = filter->lfv;
 		    break;
 		  }  /* end of switch (filtertype) */
-#endif    
 
 		  /* new data arrived */
 		  list->new = 1;
