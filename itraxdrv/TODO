@@ -1,0 +1,5 @@
+- set up toplevel Makefile to determine kernel version and
+  jump into appropriate subdir
+- move testtracker.c into subdir "examples"
+- add gtrack
+- release new version
