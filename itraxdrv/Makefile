@@ -1,5 +1,4 @@
-INCLUDEDIR= /lib/modules/`uname -r`/build/include/
-#KERNELSOURCE=/home/evers/linux
+INCLUDEDIR= /lib/modules/`uname -r`/build/include
 KERNELSOURCE=/usr/src/linux
 DEVICE=/dev/input/tracker0
 

@@ -55,8 +55,7 @@ int main (int argc,char *argv[])
    short id[4];
    char name[100];
    int abs[5];
-   float call_data[3]; 
-  int finished,callibrated;
+   int finished;
   struct filtercontrol  filter;
   char c;
   WINDOW *win;
@@ -124,43 +123,18 @@ int main (int argc,char *argv[])
 
   
   finished = FALSE;
-  callibrated = FALSE;
 
   while ( ! finished  ) 
     { 
  
       read(tracker, &data, sizeof (struct trackerposition));
-      if (callibrated)
-	fprintf(stderr," %5.1f %5.1f %5.1f C\r",data.callibrate[0],data.callibrate[1],
-		data.callibrate[2]);   
-      else
-	fprintf(stderr," %5.1f %5.1f %5.1f  \r",data.raw[0],data.raw[1],data.raw[2]);
+      fprintf(stderr," %5.1f %5.1f %5.1f  \r",data.raw[0],data.raw[1],data.raw[2]);
       
       c = getch();
       switch (c) 
 	{
 	case 'q': 
 	  finished = TRUE;
-	  break;
-	case 'c':  
-	  if (ioctl(tracker,ITRAXIOCSCALL,0) <0) {
-	    perror("ioctl ITRAXIOCSCALL");
-	    exit(1);
-	  }   
-	  callibrated = TRUE;
-	  break;
-	case 'u':  
-	  call_data[0]=10.0;
-	  call_data[1]=20.0;
-	  call_data[2]=30.0;
-	  if (ioctl(tracker,ITRAXIOCSCALLUSER,call_data) <0) {
-	    perror("ioctl ITRAXIOCSCALLUSER");
-	    exit(1);
-	  }   
-	  callibrated = TRUE;
-	  break;
-	case 'd':
-	  callibrated = FALSE;
 	  break;
 	default:
 	  break;
@@ -169,17 +143,6 @@ int main (int argc,char *argv[])
   echo();
   nocbreak();
   endwin();  
-	  call_data[0]=0.0;
-	  call_data[1]=0.0;
-	  call_data[2]=0.0;
-
-
-	  if (ioctl(tracker,ITRAXIOCGCALL,call_data) <0)
-	    perror("ioctl ITRAXIOCGCALL");
-	  else
-	    printf("Call: %f %f %f\n",call_data[0],call_data[1],call_data[2]);
-
-
   
   close(tracker);
   return 0;
